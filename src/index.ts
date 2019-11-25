@@ -14,9 +14,12 @@ export type CocoResponse = {
 export class ComponentSession {
     private component_id = "";
     private session_id = "";
-    constructor(component_id: string, session_id: string = uuid()) {
+    private developer_key = "";
+
+    constructor(component_id: string, developer_key: string, session_id: string = uuid()) {
         this.component_id = component_id;
         this.session_id = session_id;
+        this.developer_key = developer_key;
     }
 
     reset(session_id: string = uuid()) {
@@ -32,7 +35,8 @@ export class ComponentSession {
                 {
                     method: "POST",
                     url: `https://app.coco.imperson.com/api/exchange/${this.component_id}/${this.session_id}`,
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    headers: {"api-key": this.developer_key}
                 },
                 function(error, response, body) {
                     if (response.statusCode !== 200) {

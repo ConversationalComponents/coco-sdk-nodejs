@@ -1,6 +1,6 @@
 {
     "name": "@aleximp/coco-sdk-nodejs",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "Conversional Components nodejs sdk",
     "repository": "https://github.com/ConversationalComponents/coco-sdk-nodejs.git",
     "main": "lib/index.js",
