@@ -11,6 +11,37 @@ export type CocoResponse = {
   raw_resp: { [key: string]: any };
 };
 
+export function exchange(component_id: string, session_id: string, user_input?: string, context?: any, developer_key: string="") {
+  return new Promise<CocoResponse>((resolve, reject) => {
+    const payload = {} as any;
+    user_input && (payload.user_input = user_input);
+    context && (payload.context = context);
+    request(
+      {
+        method: "POST",
+        url: `https://marketplace.conversationalcomponents.com/api/exchange/${component_id}/${session_id}`,
+        body: JSON.stringify(payload),
+        headers: { "api-key": developer_key }
+      },
+      function(error, response, body) {
+        if (response.statusCode !== 200) {
+          reject(new Error(response.body));
+        }
+        if (error) {
+          reject(error as Error);
+          return;
+        }
+        try {
+          const bodyJson = JSON.parse(body);
+          resolve({ ...bodyJson, raw_resp: response } as CocoResponse);
+        } catch (e) {
+          reject(e as Error);
+        }
+      }
+    );
+  });
+};
+
 export class ComponentSession {
   private component_id = "";
   private session_id = "";
@@ -31,33 +62,6 @@ export class ComponentSession {
   }
 
   call(user_input?: string, context?: any) {
-    return new Promise<CocoResponse | Error>((resolve, reject) => {
-      const payload = {} as any;
-      user_input && (payload.user_input = user_input);
-      context && (payload.context = context);
-      request(
-        {
-          method: "POST",
-          url: `https://app.coco.imperson.com/api/exchange/${this.component_id}/${this.session_id}`,
-          body: JSON.stringify(payload),
-          headers: { "api-key": this.developer_key }
-        },
-        function(error, response, body) {
-          if (response.statusCode !== 200) {
-            reject(new Error(response.body));
-          }
-          if (error) {
-            reject(error as Error);
-            return;
-          }
-          try {
-            const bodyJson = JSON.parse(body);
-            resolve({ ...bodyJson, raw_resp: response } as CocoResponse);
-          } catch (e) {
-            reject(e as Error);
-          }
-        }
-      );
-    });
+    return exchange(this.component_id, this.session_id, user_input, context);
   }
 }
