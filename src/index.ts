@@ -1,4 +1,4 @@
-import uuid = require("uuid/v4");
+const { v4: uuid } = require("uuid");
 import request = require("request");
 
 export type CocoResponse = {
@@ -11,7 +11,13 @@ export type CocoResponse = {
   raw_resp: { [key: string]: any };
 };
 
-export function exchange(component_id: string, session_id: string, user_input?: string, context?: any, developer_key: string="") {
+export function exchange(
+  component_id: string,
+  session_id: string,
+  user_input?: string,
+  context?: any,
+  developer_key: string = ""
+) {
   return new Promise<CocoResponse>((resolve, reject) => {
     const payload = {} as any;
     user_input && (payload.user_input = user_input);
@@ -19,11 +25,11 @@ export function exchange(component_id: string, session_id: string, user_input?: 
     request(
       {
         method: "POST",
-        url: `https://marketplace.conversationalcomponents.com/api/exchange/${component_id}/${session_id}`,
+        url: `https://cocohub.ai/api/exchange/${component_id}/${session_id}`,
         body: JSON.stringify(payload),
-        headers: { "api-key": developer_key }
+        headers: { "api-key": developer_key },
       },
-      function(error, response, body) {
+      function (error, response, body) {
         if (response.statusCode !== 200) {
           reject(new Error(response.body));
         }
@@ -40,7 +46,7 @@ export function exchange(component_id: string, session_id: string, user_input?: 
       }
     );
   });
-};
+}
 
 export class ComponentSession {
   private component_id = "";
